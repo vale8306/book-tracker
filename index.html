@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lecturas ✦ Book Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+/* ─── CSS VARIABLES ─────────────────────────────────────────────── */
+:root {
+  --orange:    #FF9237;
+  --orange2:   #FF8940;
+  --lila:      #C8A9E2;
+  --pink:      #FF4092;
+  --mint:      #B0D4CC;
+  --bg:        #FAF8F5;
+  --surface:   #FFFFFF;
+  --border:    #F0EBE3;
+  --text:      #2D2D2D;
+  --text-soft: #888888;
+  --shadow:    0 4px 24px rgba(0,0,0,0.07);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+  --radius:    18px;
+  --radius-sm: 10px;
+  --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+
+[data-theme="dark"] {
+  --bg:        #1A1A1E;
+  --surface:   #252529;
+  --border:    #333338;
+  --text:      #F0EBE3;
+  --text-soft: #888888;
+  --shadow:    0 4px 24px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.4);
+}
+
+/* ─── RESET & BASE ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+  overflow-x: hidden;
+}
+
+/* ─── HEADER ────────────────────────────────────────────────────── */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
+}
+
+.header-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 62px;
+}
+
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  color: var(--pink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-dot { color: var(--lila); }
+
+.header-actions { display: flex; align-items: center; gap: 10px; }
+
+.icon-btn {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  transition: all var(--transition);
+  color: var(--text);
+}
+.icon-btn:hover { border-color: var(--pink); background: var(--pink); color: #fff; transform: scale(1.05); }
+
+/* ─── MAIN LAYOUT ───────────────────────────────────────────────── */
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ─── SECTION TITLE ─────────────────────────────────────────────── */
+.section-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+  margin-bottom: 12px;
+}
+
+/* ─── DASHBOARD CARDS ───────────────────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 18px 16px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: transform var(--transition), box-shadow var(--transition);
+  cursor: default;
+}
+.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+.stat-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+.stat-icon.pink  { background: rgba(255,64,146,0.12); }
+.stat-icon.orange{ background: rgba(255,146,55,0.12); }
+.stat-icon.lila  { background: rgba(200,169,226,0.2); }
+.stat-icon.mint  { background: rgba(176,212,204,0.25); }
+
+.stat-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+
+/* ─── META ANUAL ────────────────────────────────────────────────── */
+.goal-card {
+  background: linear-gradient(135deg, var(--pink) 0%, var(--orange) 100%);
+  border-radius: var(--radius);
+  padding: 22px 20px;
+  color: #fff;
+  box-shadow: 0 8px 30px rgba(255,64,146,0.3);
+}
+
+.goal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.goal-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-style: italic;
+}
+
+.goal-input-wrap { display: flex; align-items: center; gap: 6px; }
+
+.goal-input {
+  width: 54px;
+  background: rgba(255,255,255,0.25);
+  border: 1.5px solid rgba(255,255,255,0.5);
+  border-radius: 8px;
+  padding: 4px 8px;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  font-family: 'DM Sans', sans-serif;
+}
+.goal-input::placeholder { color: rgba(255,255,255,0.7); }
+.goal-input:focus { outline: none; background: rgba(255,255,255,0.35); }
+
+.goal-label-sm { font-size: 0.78rem; opacity: 0.85; }
+
+.progress-bar-wrap {
+  background: rgba(255,255,255,0.25);
+  border-radius: 999px;
+  height: 10px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: #fff;
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+
+.goal-pct {
+  font-size: 0.8rem;
+  opacity: 0.9;
+  font-weight: 600;
+}
+
+/* ─── SEARCH & FILTER ───────────────────────────────────────────── */
+.controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.search-wrap {
+  flex: 1;
+  min-width: 160px;
+  position: relative;
+}
+
+.search-wrap svg {
+  position: absolute;
+  left: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--text-soft);
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 11px 14px 11px 38px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  transition: border-color var(--transition);
+}
+.search-input:focus { outline: none; border-color: var(--pink); }
+.search-input::placeholder { color: var(--text-soft); }
+
+.filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.pill {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-soft);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.pill:hover { border-color: var(--pink); color: var(--pink); }
+.pill.active {
+  background: var(--pink);
+  border-color: var(--pink);
+  color: #fff;
+}
+
+/* ─── BOOK LIST ─────────────────────────────────────────────────── */
+#books-list { display: flex; flex-direction: column; gap: 12px; }
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-soft);
+}
+.empty-state .emoji { font-size: 3rem; margin-bottom: 12px; }
+.empty-state p { font-size: 0.9rem; }
+.empty-state strong { color: var(--pink); }
+
+.book-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  transition: transform var(--transition), box-shadow var(--transition);
+  animation: slideIn 0.3s ease;
+}
+.book-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.book-spine {
+  width: 6px;
+  min-height: 60px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  align-self: stretch;
+}
+.spine-done    { background: var(--mint); }
+.spine-reading { background: var(--orange); }
+.spine-pending { background: var(--lila); }
+
+.book-content { flex: 1; min-width: 0; }
+
+.book-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-author {
+  font-size: 0.78rem;
+  color: var(--text-soft);
+  margin-bottom: 8px;
+}
+
+.book-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.status-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.04em;
+}
+.badge-done    { background: rgba(176,212,204,0.3); color: #4A8A7F; }
+.badge-reading { background: rgba(255,146,55,0.15); color: #C06800; }
+.badge-pending { background: rgba(200,169,226,0.25); color: #7A5A9E; }
+
+[data-theme="dark"] .badge-done    { background: rgba(176,212,204,0.15); color: var(--mint); }
+[data-theme="dark"] .badge-reading { background: rgba(255,146,55,0.15); color: var(--orange); }
+[data-theme="dark"] .badge-pending { background: rgba(200,169,226,0.15); color: var(--lila); }
+
+.book-rating { font-size: 0.85rem; letter-spacing: 1px; }
+
+.book-dates {
+  font-size: 0.7rem;
+  color: var(--text-soft);
+  margin-top: 6px;
+}
+
+.book-notes-preview {
+  font-size: 0.75rem;
+  color: var(--text-soft);
+  margin-top: 6px;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.action-btn {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem;
+  transition: all var(--transition);
+  color: var(--text-soft);
+}
+.action-btn:hover { border-color: var(--pink); color: var(--pink); background: rgba(255,64,146,0.08); }
+.action-btn.delete:hover { border-color: #E53935; color: #E53935; background: rgba(229,57,53,0.08); }
+
+/* ─── FLOATING ADD BUTTON ───────────────────────────────────────── */
+.fab {
+  position: fixed;
+  bottom: 24px;
+  right: 20px;
+  width: 58px; height: 58px;
+  border-radius: 50%;
+  background: var(--pink);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem;
+  box-shadow: 0 6px 24px rgba(255,64,146,0.4);
+  transition: all var(--transition);
+  z-index: 200;
+}
+.fab:hover { background: var(--orange); transform: scale(1.08) rotate(90deg); box-shadow: 0 8px 32px rgba(255,146,55,0.4); }
+
+/* ─── MODAL ─────────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  z-index: 300;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition);
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-width: 720px;
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 28px 20px 40px;
+  transform: translateY(30px);
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+
+.modal-handle {
+  width: 40px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 20px;
+}
+
+.modal-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  color: var(--pink);
+  margin-bottom: 20px;
+}
+
+/* ─── FORM ───────────────────────────────────────────────────────── */
+.form-grid { display: flex; flex-direction: column; gap: 14px; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+
+.form-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-soft);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.form-input, .form-select, .form-textarea {
+  padding: 11px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none;
+  border-color: var(--pink);
+  box-shadow: 0 0 0 3px rgba(255,64,146,0.1);
+}
+.form-textarea { resize: vertical; min-height: 80px; }
+.form-select { cursor: pointer; }
+
+/* ─── STAR RATING ────────────────────────────────────────────────── */
+.star-group { display: flex; flex-direction: column; gap: 5px; }
+
+.stars {
+  display: flex;
+  gap: 4px;
+}
+
+.star {
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: transform var(--transition), filter var(--transition);
+  user-select: none;
+  filter: grayscale(1) opacity(0.35);
+}
+.star.active { filter: none; }
+.star:hover  { transform: scale(1.2); }
+
+/* ─── SUBMIT BTN ─────────────────────────────────────────────────── */
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--pink);
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-top: 6px;
+  letter-spacing: 0.03em;
+}
+.btn-primary:hover { background: var(--orange); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,146,55,0.35); }
+.btn-primary:active { transform: translateY(0); }
+
+.btn-secondary {
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text-soft);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.btn-secondary:hover { border-color: var(--text-soft); color: var(--text); }
+
+/* ─── TOAST ──────────────────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 96px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--text);
+  color: var(--bg);
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  z-index: 400;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ─── SCROLLBAR ──────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+/* ─── CONFIRM DIALOG ─────────────────────────────────────────────── */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition);
+}
+.confirm-overlay.open { opacity: 1; pointer-events: all; }
+
+.confirm-box {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  max-width: 320px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  transform: scale(0.92);
+  transition: transform 0.25s ease;
+}
+.confirm-overlay.open .confirm-box { transform: scale(1); }
+
+.confirm-emoji { font-size: 2.5rem; margin-bottom: 12px; }
+.confirm-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 6px; }
+.confirm-text  { font-size: 0.83rem; color: var(--text-soft); margin-bottom: 20px; }
+
+.confirm-btns { display: flex; gap: 10px; }
+
+.btn-danger {
+  flex: 1; padding: 12px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: #E53935;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.btn-danger:hover { background: #C62828; }
+
+/* ─── COUNTER BADGE ──────────────────────────────────────────────── */
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.count-badge {
+  background: var(--lila);
+  color: #5A3B8A;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+[data-theme="dark"] .count-badge { color: var(--surface); }
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────────── */
+@media (min-width: 480px) {
+  main { padding: 28px 24px 100px; }
+  .fab { right: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── HEADER ──────────────────────────────────────────────────── -->
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      📖 Lecturas<span class="logo-dot"> ✦</span>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="theme-toggle" title="Modo oscuro" aria-label="Toggle dark mode">🌙</button>
+    </div>
+  </div>
+</header>
+
+<!-- ─── MAIN ────────────────────────────────────────────────────── -->
+<main>
+
+  <!-- DASHBOARD -->
+  <section>
+    <p class="section-label">Mi progreso</p>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon pink">📚</div>
+        <span class="stat-value" id="stat-total">0</span>
+        <span class="stat-label">Libros en total</span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon mint">✅</div>
+        <span class="stat-value" id="stat-done">0</span>
+        <span class="stat-label">Terminados</span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon orange">📖</div>
+        <span class="stat-value" id="stat-reading">0</span>
+        <span class="stat-label">Leyendo ahora</span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon lila">⭐</div>
+        <span class="stat-value" id="stat-rating">—</span>
+        <span class="stat-label">Rating promedio</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- META ANUAL -->
+  <section>
+    <div class="goal-card">
+      <div class="goal-header">
+        <div class="goal-title">Meta de lectura anual</div>
+        <div class="goal-input-wrap">
+          <input type="number" class="goal-input" id="goal-input" min="1" max="999" placeholder="20" />
+          <span class="goal-label-sm">libros</span>
+        </div>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+      <div class="goal-pct" id="goal-pct">0 de 0 libros — 0% completado</div>
+    </div>
+  </section>
+
+  <!-- BÚSQUEDA & FILTROS -->
+  <section>
+    <div class="controls">
+      <div class="search-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+        </svg>
+        <input type="text" class="search-input" id="search-input" placeholder="Buscar por título..." />
+      </div>
+      <div class="filter-pills">
+        <button class="pill active" data-filter="all">Todos</button>
+        <button class="pill" data-filter="reading">Leyendo</button>
+        <button class="pill" data-filter="done">Terminados</button>
+        <button class="pill" data-filter="pending">Pendientes</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LISTA DE LIBROS -->
+  <section>
+    <div class="list-header">
+      <p class="section-label" style="margin-bottom:0">Mi biblioteca</p>
+      <span class="count-badge" id="count-badge">0 libros</span>
+    </div>
+    <div style="height:12px"></div>
+    <div id="books-list">
+      <!-- libros se renderizan aquí -->
+    </div>
+  </section>
+
+</main>
+
+<!-- ─── FAB ─────────────────────────────────────────────────────── -->
+<button class="fab" id="fab-add" aria-label="Agregar libro" title="Agregar libro">＋</button>
+
+<!-- ─── MODAL FORMULARIO ─────────────────────────────────────────── -->
+<div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-heading">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 class="modal-title" id="modal-heading">✦ Agregar libro</h2>
+
+    <div class="form-grid">
+      <input type="hidden" id="edit-id" />
+
+      <div class="form-group">
+        <label class="form-label" for="f-title">Título *</label>
+        <input type="text" class="form-input" id="f-title" placeholder="El nombre del libro..." />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="f-author">Autor *</label>
+        <input type="text" class="form-input" id="f-author" placeholder="Nombre del autor..." />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="f-start">Fecha inicio</label>
+          <input type="date" class="form-input" id="f-start" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="f-end">Fecha fin</label>
+          <input type="date" class="form-input" id="f-end" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="f-status">Estado</label>
+        <select class="form-select" id="f-status">
+          <option value="pending">📋 No iniciado</option>
+          <option value="reading">📖 Leyendo</option>
+          <option value="done">✅ Terminado</option>
+        </select>
+      </div>
+
+      <div class="star-group">
+        <label class="form-label">Rating</label>
+        <div class="stars" id="stars-container" role="group" aria-label="Calificación">
+          <span class="star" data-val="1">★</span>
+          <span class="star" data-val="2">★</span>
+          <span class="star" data-val="3">★</span>
+          <span class="star" data-val="4">★</span>
+          <span class="star" data-val="5">★</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="f-notes">Notas</label>
+        <textarea class="form-textarea" id="f-notes" placeholder="Mis notas, citas o reflexiones..."></textarea>
+      </div>
+
+      <button class="btn-primary" id="save-btn">Guardar libro</button>
+      <button class="btn-secondary" id="cancel-btn">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CONFIRM DIALOG ───────────────────────────────────────────── -->
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <div class="confirm-emoji">🗑️</div>
+    <div class="confirm-title">¿Eliminar este libro?</div>
+    <div class="confirm-text">Esta acción no se puede deshacer.</div>
+    <div class="confirm-btns">
+      <button class="btn-secondary" id="confirm-cancel">Cancelar</button>
+      <button class="btn-danger" id="confirm-ok">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── TOAST ────────────────────────────────────────────────────── -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════
+//  BOOK TRACKER — App Logic
+// ════════════════════════════════════════════════════════════════════
+
+/* ── State ─────────────────────────────────────────────────────── */
+let books       = [];
+let currentFilter = 'all';
+let searchQuery   = '';
+let currentRating = 0;
+let deleteTargetId = null;
+
+/* ── Helpers ────────────────────────────────────────────────────── */
+const $ = id => document.getElementById(id);
+
+const uid = () => '_' + Math.random().toString(36).substr(2, 9);
+
+const statusMap = {
+  done:    { label: 'Terminado',   badge: 'badge-done',    spine: 'spine-done' },
+  reading: { label: 'Leyendo',     badge: 'badge-reading', spine: 'spine-reading' },
+  pending: { label: 'No iniciado', badge: 'badge-pending', spine: 'spine-pending' },
+};
+
+const stars = (n, max = 5) => {
+  if (!n) return '<span style="color:var(--text-soft);font-size:0.75rem">Sin rating</span>';
+  return '★'.repeat(n) + '<span style="opacity:0.2">★</span>'.repeat(max - n);
+};
+
+const formatDate = iso => {
+  if (!iso) return null;
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' });
+};
+
+/* ── LocalStorage ───────────────────────────────────────────────── */
+const save = () => localStorage.setItem('lecturas_books', JSON.stringify(books));
+
+const load = () => {
+  const raw = localStorage.getItem('lecturas_books');
+  books = raw ? JSON.parse(raw) : [];
+};
+
+const saveGoal = v => localStorage.setItem('lecturas_goal', v);
+const loadGoal = () => parseInt(localStorage.getItem('lecturas_goal') || '20', 10);
+
+const saveDark = v => localStorage.setItem('lecturas_dark', v ? '1' : '0');
+const loadDark = () => localStorage.getItem('lecturas_dark') === '1';
+
+/* ── Toast ──────────────────────────────────────────────────────── */
+let toastTimer;
+const showToast = msg => {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+};
+
+/* ── Dark Mode ──────────────────────────────────────────────────── */
+const applyDark = dark => {
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '');
+  $('theme-toggle').textContent = dark ? '☀️' : '🌙';
+};
+
+$('theme-toggle').addEventListener('click', () => {
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  applyDark(!dark);
+  saveDark(!dark);
+});
+
+/* ── Dashboard ──────────────────────────────────────────────────── */
+const updateDashboard = () => {
+  const total   = books.length;
+  const done    = books.filter(b => b.status === 'done').length;
+  const reading = books.filter(b => b.status === 'reading').length;
+  const rated   = books.filter(b => b.rating);
+  const avg     = rated.length
+    ? (rated.reduce((s, b) => s + b.rating, 0) / rated.length).toFixed(1)
+    : null;
+
+  $('stat-total').textContent   = total;
+  $('stat-done').textContent    = done;
+  $('stat-reading').textContent = reading;
+  $('stat-rating').textContent  = avg ? avg + ' ★' : '—';
+
+  // Goal
+  const goal = loadGoal();
+  const pct  = goal ? Math.min(100, Math.round((done / goal) * 100)) : 0;
+  $('progress-fill').style.width = pct + '%';
+  $('goal-pct').textContent = `${done} de ${goal} libros — ${pct}% completado`;
+};
+
+/* ── Goal Input ─────────────────────────────────────────────────── */
+const goalEl = $('goal-input');
+goalEl.value = loadGoal();
+goalEl.addEventListener('change', () => {
+  const v = Math.max(1, parseInt(goalEl.value, 10) || 1);
+  goalEl.value = v;
+  saveGoal(v);
+  updateDashboard();
+});
+
+/* ── Render Books ───────────────────────────────────────────────── */
+const renderBooks = () => {
+  let filtered = books.filter(b => {
+    const matchFilter = currentFilter === 'all' || b.status === currentFilter;
+    const matchSearch = b.title.toLowerCase().includes(searchQuery) ||
+                        b.author.toLowerCase().includes(searchQuery);
+    return matchFilter && matchSearch;
+  });
+
+  const list = $('books-list');
+  $('count-badge').textContent = `${filtered.length} libro${filtered.length !== 1 ? 's' : ''}`;
+
+  if (!filtered.length) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="emoji">📚</div>
+        <p>${books.length === 0
+          ? 'No hay libros aún.<br><strong>¡Agrega tu primer libro!</strong>'
+          : 'No hay libros con ese filtro.'
+        }</p>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(b => {
+    const s = statusMap[b.status] || statusMap.pending;
+    const dates = [formatDate(b.startDate), formatDate(b.endDate)].filter(Boolean);
+    const datesHtml = dates.length
+      ? `<div class="book-dates">${dates.join(' → ')}</div>`
+      : '';
+    const notesHtml = b.notes
+      ? `<div class="book-notes-preview">"${b.notes}"</div>`
+      : '';
+
+    return `
+      <div class="book-card" data-id="${b.id}">
+        <div class="book-spine ${s.spine}"></div>
+        <div class="book-content">
+          <div class="book-title">${escHtml(b.title)}</div>
+          <div class="book-author">${escHtml(b.author)}</div>
+          <div class="book-meta">
+            <span class="status-badge ${s.badge}">${s.label}</span>
+            <span class="book-rating">${stars(b.rating)}</span>
+          </div>
+          ${datesHtml}
+          ${notesHtml}
+        </div>
+        <div class="book-actions">
+          <button class="action-btn" title="Editar" onclick="openEdit('${b.id}')">✏️</button>
+          <button class="action-btn delete" title="Eliminar" onclick="confirmDelete('${b.id}')">🗑</button>
+        </div>
+      </div>`;
+  }).join('');
+};
+
+/* ── Escape HTML ────────────────────────────────────────────────── */
+const escHtml = s => s
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;');
+
+/* ── Filters ────────────────────────────────────────────────────── */
+document.querySelectorAll('.pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    currentFilter = pill.dataset.filter;
+    renderBooks();
+  });
+});
+
+$('search-input').addEventListener('input', e => {
+  searchQuery = e.target.value.trim().toLowerCase();
+  renderBooks();
+});
+
+/* ── Star Rating (form) ─────────────────────────────────────────── */
+const starEls = document.querySelectorAll('.star');
+
+const renderStars = val => {
+  starEls.forEach(s => {
+    s.classList.toggle('active', parseInt(s.dataset.val, 10) <= val);
+  });
+};
+
+starEls.forEach(s => {
+  s.addEventListener('click', () => {
+    const v = parseInt(s.dataset.val, 10);
+    currentRating = currentRating === v ? 0 : v; // toggle off if same
+    renderStars(currentRating);
+  });
+  s.addEventListener('mouseenter', () => renderStars(parseInt(s.dataset.val, 10)));
+  s.addEventListener('mouseleave', () => renderStars(currentRating));
+});
+
+/* ── Modal ──────────────────────────────────────────────────────── */
+const openModal = () => {
+  $('modal-overlay').classList.add('open');
+  $('f-title').focus();
+};
+
+const closeModal = () => {
+  $('modal-overlay').classList.remove('open');
+  resetForm();
+};
+
+const resetForm = () => {
+  $('edit-id').value    = '';
+  $('f-title').value    = '';
+  $('f-author').value   = '';
+  $('f-start').value    = '';
+  $('f-end').value      = '';
+  $('f-status').value   = 'pending';
+  $('f-notes').value    = '';
+  $('modal-heading').textContent = '✦ Agregar libro';
+  currentRating = 0;
+  renderStars(0);
+};
+
+$('fab-add').addEventListener('click', openModal);
+$('cancel-btn').addEventListener('click', closeModal);
+
+$('modal-overlay').addEventListener('click', e => {
+  if (e.target === $('modal-overlay')) closeModal();
+});
+
+/* ── Edit ───────────────────────────────────────────────────────── */
+window.openEdit = id => {
+  const b = books.find(x => x.id === id);
+  if (!b) return;
+
+  $('edit-id').value      = b.id;
+  $('f-title').value      = b.title;
+  $('f-author').value     = b.author;
+  $('f-start').value      = b.startDate || '';
+  $('f-end').value        = b.endDate   || '';
+  $('f-status').value     = b.status;
+  $('f-notes').value      = b.notes     || '';
+  $('modal-heading').textContent = '✦ Editar libro';
+
+  currentRating = b.rating || 0;
+  renderStars(currentRating);
+  openModal();
+};
+
+/* ── Save ───────────────────────────────────────────────────────── */
+$('save-btn').addEventListener('click', () => {
+  const title  = $('f-title').value.trim();
+  const author = $('f-author').value.trim();
+
+  if (!title || !author) {
+    showToast('⚠️ Título y autor son obligatorios.');
+    return;
+  }
+
+  const editId = $('edit-id').value;
+
+  const bookData = {
+    title,
+    author,
+    startDate: $('f-start').value || '',
+    endDate:   $('f-end').value   || '',
+    status:    $('f-status').value,
+    rating:    currentRating,
+    notes:     $('f-notes').value.trim(),
+  };
+
+  if (editId) {
+    const idx = books.findIndex(b => b.id === editId);
+    if (idx > -1) books[idx] = { ...books[idx], ...bookData };
+    showToast('✅ Libro actualizado.');
+  } else {
+    books.unshift({ id: uid(), createdAt: Date.now(), ...bookData });
+    showToast('📚 Libro agregado con éxito.');
+  }
+
+  save();
+  closeModal();
+  renderBooks();
+  updateDashboard();
+});
+
+/* ── Delete Confirm ─────────────────────────────────────────────── */
+window.confirmDelete = id => {
+  deleteTargetId = id;
+  $('confirm-overlay').classList.add('open');
+};
+
+$('confirm-cancel').addEventListener('click', () => {
+  $('confirm-overlay').classList.remove('open');
+  deleteTargetId = null;
+});
+
+$('confirm-ok').addEventListener('click', () => {
+  if (deleteTargetId) {
+    books = books.filter(b => b.id !== deleteTargetId);
+    save();
+    renderBooks();
+    updateDashboard();
+    showToast('🗑️ Libro eliminado.');
+  }
+  $('confirm-overlay').classList.remove('open');
+  deleteTargetId = null;
+});
+
+$('confirm-overlay').addEventListener('click', e => {
+  if (e.target === $('confirm-overlay')) {
+    $('confirm-overlay').classList.remove('open');
+    deleteTargetId = null;
+  }
+});
+
+/* ── Keyboard Shortcuts ─────────────────────────────────────────── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeModal();
+    $('confirm-overlay').classList.remove('open');
+  }
+});
+
+/* ── Init ───────────────────────────────────────────────────────── */
+load();
+applyDark(loadDark());
+renderBooks();
+updateDashboard();
+</script>
+</body>
+</html>
